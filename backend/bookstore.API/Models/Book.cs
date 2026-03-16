@@ -1,5 +1,6 @@
 namespace bookstore.API.Models;
 
+// Use this model to represent each book coming from the database.
 public class Book
 {
     public int BookID { get; set; }

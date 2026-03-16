@@ -5,14 +5,17 @@ namespace bookstore.API.Data;
 
 public class BookstoreContext : DbContext
 {
+    // Use the database settings you registered in Program.cs.
     public BookstoreContext(DbContextOptions<BookstoreContext> options) : base(options)
     {
     }
 
+    // Make the Books table available to the rest of the API.
     public DbSet<Book> Books => Set<Book>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Match this context to the existing Books table in the provided database.
         modelBuilder.Entity<Book>(entity =>
         {
             entity.ToTable("Books");

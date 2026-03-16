@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { Book, BookResponse } from './types/book'
 
+// Point the frontend to the backend route you are using during local development.
 const apiUrl = 'http://localhost:5028/books'
 
 function BookList() {
+  // Keep track of the loaded books and the user's current paging and sorting choices.
   const [books, setBooks] = useState<Book[]>([])
   const [pageSize, setPageSize] = useState<number>(5)
   const [pageNum, setPageNum] = useState<number>(1)
@@ -13,6 +15,7 @@ function BookList() {
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
+    // Reload the book list whenever the user changes page, page size, or sort order.
     const fetchBooks = async () => {
       try {
         setError('')
@@ -25,11 +28,13 @@ function BookList() {
           throw new Error('Could not load books from the API.')
         }
 
+        // Save the returned books and total count so the page can render correctly.
         const data: BookResponse = await response.json()
         setBooks(data.books)
         setTotalItems(data.totalNumBooks)
         setTotalPages(Math.ceil(data.totalNumBooks / pageSize))
       } catch (err) {
+        // Show a readable message if the frontend cannot reach the API.
         setError(err instanceof Error ? err.message : 'Something went wrong.')
       }
     }
@@ -39,8 +44,10 @@ function BookList() {
 
   return (
     <>
+      {/* Let the user know right away if the books could not be loaded. */}
       {error ? <div className="alert alert-danger">{error}</div> : null}
 
+      {/* Give the user controls for sorting and choosing how many books to see. */}
       <div className="book-controls d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
         <div>
           <label htmlFor="sortSelect" className="form-label mb-1">
@@ -80,11 +87,13 @@ function BookList() {
         </div>
       </div>
 
+      {/* Show where the user is in the full set of results. */}
       <p className="text-secondary mb-4">
         Showing page {pageNum} of {Math.max(totalPages, 1)} with {totalItems} total
         books.
       </p>
 
+      {/* Display each book's details in a readable card layout. */}
       <div className="row g-3">
         {books.map((book) => (
           <div key={book.bookID} className="col-12">
@@ -120,6 +129,7 @@ function BookList() {
         ))}
       </div>
 
+      {/* Create the page navigation buttons from the total results. */}
       <div className="d-flex justify-content-center align-items-center flex-wrap gap-2 my-4">
         <button
           className="btn btn-outline-primary"

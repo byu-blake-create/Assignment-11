@@ -1,5 +1,6 @@
 function BookstoreHeader() {
   return (
+    // Introduce the bookstore page before the user starts browsing books.
     <section className="bookstore-header">
       <h1>Online Bookstore</h1>
       <p className="subtitle">

@@ -1,3 +1,4 @@
+// Keep the frontend aligned with the shape of each book from the API.
 export interface Book {
   bookID: number
   title: string
@@ -10,6 +11,7 @@ export interface Book {
   price: number
 }
 
+// Keep the frontend aligned with the paginated response from the books endpoint.
 export interface BookResponse {
   books: Book[]
   totalNumBooks: number
