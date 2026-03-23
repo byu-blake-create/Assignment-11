@@ -10,6 +10,7 @@ function CartSummary() {
   const returnTo = `${location.pathname}${location.search}`
 
   const openCart = () => {
+    // Pass the current page location into the cart so the user can return here.
     navigate('/cart', { state: { returnTo } })
   }
 

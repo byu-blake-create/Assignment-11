@@ -24,6 +24,7 @@ function CartPage() {
       setShowToast(false)
     }, 2500)
 
+    // Dismiss the toast automatically after a short confirmation window.
     return () => window.clearTimeout(timeoutId)
   }, [locationState?.addedTitle])
 

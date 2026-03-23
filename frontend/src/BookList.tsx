@@ -18,6 +18,7 @@ function BookList() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
+  // Mirror the browsing state into the URL so pagination and filters survive route changes.
   const pageSize = Math.max(1, Number(searchParams.get('pageSize')) || 5)
   const pageNum = Math.max(1, Number(searchParams.get('pageNum')) || 1)
   const sort = searchParams.get('sort') ?? 'title_asc'
@@ -95,6 +96,7 @@ function BookList() {
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
 
   const handleAddToCart = (book: Book) => {
+    // Convert the current book into the cart shape expected by the shared context.
     const newItem: CartItem = {
       bookId: book.bookID,
       bookTitle: book.title,
@@ -103,6 +105,7 @@ function BookList() {
     }
 
     addToCart(newItem)
+    // Preserve the current browse state so Continue Shopping can return here.
     const returnTo = searchParams.toString() ? `/?${searchParams.toString()}` : '/'
     navigate('/cart', { state: { returnTo, addedTitle: book.title } })
   }

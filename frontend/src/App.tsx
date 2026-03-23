@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {
   return (
+    // Keep the cart alive while the user moves between the bookstore and cart routes.
     <CartProvider>
       <Router>
         <Routes>
