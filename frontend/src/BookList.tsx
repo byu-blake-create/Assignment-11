@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCart } from './context/CartContext'
 import type { CartItem } from './types/CartItem'
 import type { Book, BookResponse } from './types/book'
@@ -11,14 +11,30 @@ function BookList() {
   // Keep track of the loaded books and the user's current paging and sorting choices.
   const [books, setBooks] = useState<Book[]>([])
   const [categories, setCategories] = useState<string[]>(['All'])
-  const [pageSize, setPageSize] = useState<number>(5)
-  const [pageNum, setPageNum] = useState<number>(1)
-  const [sort, setSort] = useState<string>('title_asc')
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [totalItems, setTotalItems] = useState<number>(0)
   const [error, setError] = useState<string>('')
   const { addToCart, cart } = useCart()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const pageSize = Math.max(1, Number(searchParams.get('pageSize')) || 5)
+  const pageNum = Math.max(1, Number(searchParams.get('pageNum')) || 1)
+  const sort = searchParams.get('sort') ?? 'title_asc'
+  const selectedCategory = searchParams.get('category') ?? 'All'
+
+  const updateSearchParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams)
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value || value === 'All') {
+        nextParams.delete(key)
+      } else {
+        nextParams.set(key, value)
+      }
+    })
+
+    setSearchParams(nextParams)
+  }
 
   useEffect(() => {
     // Load the available categories once so the filter options come from the API.
@@ -86,7 +102,8 @@ function BookList() {
     }
 
     addToCart(newItem)
-    navigate('/cart')
+    const returnTo = searchParams.toString() ? `/?${searchParams.toString()}` : '/'
+    navigate('/cart', { state: { returnTo } })
   }
 
   return (
@@ -105,8 +122,10 @@ function BookList() {
             className="form-select"
             value={selectedCategory}
             onChange={(event) => {
-              setSelectedCategory(event.target.value)
-              setPageNum(1)
+              updateSearchParams({
+                category: event.target.value,
+                pageNum: '1',
+              })
             }}
           >
             {categories.map((category) => (
@@ -126,8 +145,10 @@ function BookList() {
             className="form-select"
             value={sort}
             onChange={(event) => {
-              setSort(event.target.value)
-              setPageNum(1)
+              updateSearchParams({
+                sort: event.target.value,
+                pageNum: '1',
+              })
             }}
           >
             <option value="title_asc">Title (A-Z)</option>
@@ -144,8 +165,10 @@ function BookList() {
             className="form-select"
             value={pageSize}
             onChange={(event) => {
-              setPageSize(Number(event.target.value))
-              setPageNum(1)
+              updateSearchParams({
+                pageSize: event.target.value,
+                pageNum: '1',
+              })
             }}
           >
             <option value="5">5</option>
@@ -217,7 +240,7 @@ function BookList() {
         <button
           className="btn btn-outline-primary"
           disabled={pageNum === 1}
-          onClick={() => setPageNum(pageNum - 1)}
+          onClick={() => updateSearchParams({ pageNum: (pageNum - 1).toString() })}
         >
           Previous
         </button>
@@ -226,7 +249,7 @@ function BookList() {
           <button
             key={index + 1}
             className="btn btn-outline-primary"
-            onClick={() => setPageNum(index + 1)}
+            onClick={() => updateSearchParams({ pageNum: (index + 1).toString() })}
             disabled={pageNum === index + 1}
           >
             {index + 1}
@@ -236,7 +259,7 @@ function BookList() {
         <button
           className="btn btn-outline-primary"
           disabled={pageNum === totalPages || totalPages === 0}
-          onClick={() => setPageNum(pageNum + 1)}
+          onClick={() => updateSearchParams({ pageNum: (pageNum + 1).toString() })}
         >
           Next
         </button>

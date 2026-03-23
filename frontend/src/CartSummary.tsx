@@ -1,11 +1,17 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from './context/CartContext'
 
 function CartSummary() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { cart } = useCart()
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const returnTo = `${location.pathname}${location.search}`
+
+  const openCart = () => {
+    navigate('/cart', { state: { returnTo } })
+  }
 
   return (
     <section
@@ -13,11 +19,11 @@ function CartSummary() {
       aria-live="polite"
       role="button"
       tabIndex={0}
-      onClick={() => navigate('/cart')}
+      onClick={openCart}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          navigate('/cart')
+          openCart()
         }
       }}
     >
@@ -25,9 +31,7 @@ function CartSummary() {
         <div>
           <h2 className="h6 mb-1">Cart Summary</h2>
           <p className="mb-0 text-secondary">
-            {totalQuantity === 0
-              ? 'Your cart is empty.'
-              : `${cart.length} line item(s), ${totalQuantity} book(s)`}
+            {cart.length} line item(s), {totalQuantity} book(s)
           </p>
         </div>
 

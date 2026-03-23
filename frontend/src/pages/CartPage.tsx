@@ -1,9 +1,16 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
+interface CartPageLocationState {
+  returnTo?: string
+}
+
 function CartPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { cart, clearCart, removeFromCart, totalAmount, totalQuantity } = useCart()
+  const locationState = location.state as CartPageLocationState | null
+  const continueShoppingTarget = locationState?.returnTo ?? '/'
 
   return (
     <main className="app-shell">
@@ -20,7 +27,7 @@ function CartPage() {
           <button
             type="button"
             className="btn btn-outline-secondary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(continueShoppingTarget)}
           >
             Continue Shopping
           </button>
