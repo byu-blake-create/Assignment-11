@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("bookstore.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+286961e777399dd040d6e137c34a4f256511d8b7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+812b4026cd31910073572820177deaa1fe4c3b92")]
 [assembly: System.Reflection.AssemblyProductAttribute("bookstore.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("bookstore.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

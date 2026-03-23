@@ -7,22 +7,51 @@ const apiUrl = 'http://localhost:5028/books'
 function BookList() {
   // Keep track of the loaded books and the user's current paging and sorting choices.
   const [books, setBooks] = useState<Book[]>([])
+  const [categories, setCategories] = useState<string[]>(['All'])
   const [pageSize, setPageSize] = useState<number>(5)
   const [pageNum, setPageNum] = useState<number>(1)
   const [sort, setSort] = useState<string>('title_asc')
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [totalItems, setTotalItems] = useState<number>(0)
-  const [totalPages, setTotalPages] = useState<number>(0)
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
-    // Reload the book list whenever the user changes page, page size, or sort order.
+    // Load the available categories once so the filter options come from the API.
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/categories`)
+
+        if (!response.ok) {
+          throw new Error('Could not load book categories from the API.')
+        }
+
+        const data: string[] = await response.json()
+        setCategories(data.length > 0 ? data : ['All'])
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.')
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    // Reload the book list whenever the user changes page, page size, sort order, or category.
     const fetchBooks = async () => {
       try {
         setError('')
 
-        const response = await fetch(
-          `${apiUrl}?pageSize=${pageSize}&pageNum=${pageNum}&sort=${sort}`,
-        )
+        const query = new URLSearchParams({
+          pageSize: pageSize.toString(),
+          pageNum: pageNum.toString(),
+          sort,
+        })
+
+        if (selectedCategory !== 'All') {
+          query.set('category', selectedCategory)
+        }
+
+        const response = await fetch(`${apiUrl}?${query.toString()}`)
 
         if (!response.ok) {
           throw new Error('Could not load books from the API.')
@@ -32,7 +61,6 @@ function BookList() {
         const data: BookResponse = await response.json()
         setBooks(data.books)
         setTotalItems(data.totalNumBooks)
-        setTotalPages(Math.ceil(data.totalNumBooks / pageSize))
       } catch (err) {
         // Show a readable message if the frontend cannot reach the API.
         setError(err instanceof Error ? err.message : 'Something went wrong.')
@@ -40,15 +68,38 @@ function BookList() {
     }
 
     fetchBooks()
-  }, [pageSize, pageNum, sort])
+  }, [pageSize, pageNum, sort, selectedCategory])
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
 
   return (
     <>
       {/* Let the user know right away if the books could not be loaded. */}
       {error ? <div className="alert alert-danger">{error}</div> : null}
 
-      {/* Give the user controls for sorting and choosing how many books to see. */}
+      {/* Give the user controls for filtering, sorting, and choosing how many books to see. */}
       <div className="book-controls d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+          <label htmlFor="categorySelect" className="form-label mb-1">
+            Filter by category
+          </label>
+          <select
+            id="categorySelect"
+            className="form-select"
+            value={selectedCategory}
+            onChange={(event) => {
+              setSelectedCategory(event.target.value)
+              setPageNum(1)
+            }}
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label htmlFor="sortSelect" className="form-label mb-1">
             Sort by title
@@ -89,8 +140,8 @@ function BookList() {
 
       {/* Show where the user is in the full set of results. */}
       <p className="text-secondary mb-4">
-        Showing page {pageNum} of {Math.max(totalPages, 1)} with {totalItems} total
-        books.
+        Showing page {pageNum} of {totalPages} with {totalItems} total books
+        {selectedCategory === 'All' ? '' : ` in ${selectedCategory}`}.
       </p>
 
       {/* Display each book's details in a readable card layout. */}
