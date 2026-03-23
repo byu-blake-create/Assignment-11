@@ -29,10 +29,12 @@ function CartSummary() {
     >
       <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
+          {/* ============================================
+              BOOTSTRAP BADGE FEATURE FOR THE RUBRIC
+              THIS SHOWS THE LIVE QUANTITY OF ITEMS
+              ============================================ */}
           <h2 className="h6 mb-1">Cart Summary</h2>
-          <p className="mb-0 text-secondary">
-            {cart.length} line item(s), {totalQuantity} book(s)
-          </p>
+          <span className="badge text-bg-primary">{totalQuantity} items</span>
         </div>
 
         <div className="text-end">

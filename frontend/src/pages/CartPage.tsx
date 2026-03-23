@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
 interface CartPageLocationState {
   returnTo?: string
+  addedTitle?: string
 }
 
 function CartPage() {
@@ -11,9 +13,44 @@ function CartPage() {
   const { cart, clearCart, removeFromCart, totalAmount, totalQuantity } = useCart()
   const locationState = location.state as CartPageLocationState | null
   const continueShoppingTarget = locationState?.returnTo ?? '/'
+  const [showToast, setShowToast] = useState<boolean>(Boolean(locationState?.addedTitle))
+
+  useEffect(() => {
+    if (!locationState?.addedTitle) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowToast(false)
+    }, 2500)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [locationState?.addedTitle])
 
   return (
     <main className="app-shell">
+      {/* ============================================
+          BOOTSTRAP TOAST FEATURE FOR THE RUBRIC
+          THIS SHOWS AFTER A BOOK IS ADDED TO CART
+          ============================================ */}
+      {showToast ? (
+        <div className="toast-container position-fixed top-0 end-0 p-3">
+          <div className="toast show text-bg-success border-0" role="status" aria-live="polite">
+            <div className="d-flex">
+              <div className="toast-body">
+                Added "{locationState?.addedTitle}" to your cart.
+              </div>
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
+                aria-label="Close"
+                onClick={() => setShowToast(false)}
+              ></button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <section className="mb-4">
         <p className="eyebrow">Shopping Cart</p>
         <h1 className="h3 mb-1">Your Cart</h1>

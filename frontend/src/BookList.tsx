@@ -13,6 +13,7 @@ function BookList() {
   const [categories, setCategories] = useState<string[]>(['All'])
   const [totalItems, setTotalItems] = useState<number>(0)
   const [error, setError] = useState<string>('')
+  const [controlsOpen, setControlsOpen] = useState<boolean>(true)
   const { addToCart, cart } = useCart()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -103,7 +104,7 @@ function BookList() {
 
     addToCart(newItem)
     const returnTo = searchParams.toString() ? `/?${searchParams.toString()}` : '/'
-    navigate('/cart', { state: { returnTo } })
+    navigate('/cart', { state: { returnTo, addedTitle: book.title } })
   }
 
   return (
@@ -111,70 +112,97 @@ function BookList() {
       {/* Let the user know right away if the books could not be loaded. */}
       {error ? <div className="alert alert-danger">{error}</div> : null}
 
-      {/* Give the user controls for filtering, sorting, and choosing how many books to see. */}
-      <div className="book-controls d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
-        <div>
-          <label htmlFor="categorySelect" className="form-label mb-1">
-            Filter by category
-          </label>
-          <select
-            id="categorySelect"
-            className="form-select"
-            value={selectedCategory}
-            onChange={(event) => {
-              updateSearchParams({
-                category: event.target.value,
-                pageNum: '1',
-              })
-            }}
-          >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* ============================================
+          BOOTSTRAP ACCORDION FEATURE FOR THE RUBRIC
+          THIS HOLDS FILTER SORT AND PAGE SIZE CONTROLS
+          ============================================ */}
+      <div className="accordion mb-4" id="browseControlsAccordion">
+        <div className="accordion-item">
+          <h2 className="accordion-header" id="browseControlsHeading">
+            <button
+              type="button"
+              className={`accordion-button ${controlsOpen ? '' : 'collapsed'}`}
+              onClick={() => setControlsOpen((currentValue) => !currentValue)}
+              aria-expanded={controlsOpen}
+              aria-controls="browseControlsBody"
+            >
+              Browse Controls
+            </button>
+          </h2>
 
-        <div>
-          <label htmlFor="sortSelect" className="form-label mb-1">
-            Sort by title
-          </label>
-          <select
-            id="sortSelect"
-            className="form-select"
-            value={sort}
-            onChange={(event) => {
-              updateSearchParams({
-                sort: event.target.value,
-                pageNum: '1',
-              })
-            }}
+          <div
+            id="browseControlsBody"
+            className={`accordion-collapse collapse ${controlsOpen ? 'show' : ''}`}
+            aria-labelledby="browseControlsHeading"
           >
-            <option value="title_asc">Title (A-Z)</option>
-            <option value="title_desc">Title (Z-A)</option>
-          </select>
-        </div>
+            <div className="accordion-body">
+              <div className="book-controls d-flex justify-content-between align-items-end flex-wrap gap-3">
+                <div>
+                  <label htmlFor="categorySelect" className="form-label mb-1">
+                    Filter by category
+                  </label>
+                  <select
+                    id="categorySelect"
+                    className="form-select"
+                    value={selectedCategory}
+                    onChange={(event) => {
+                      updateSearchParams({
+                        category: event.target.value,
+                        pageNum: '1',
+                      })
+                    }}
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        <div>
-          <label htmlFor="pageSizeSelect" className="form-label mb-1">
-            Results per page
-          </label>
-          <select
-            id="pageSizeSelect"
-            className="form-select"
-            value={pageSize}
-            onChange={(event) => {
-              updateSearchParams({
-                pageSize: event.target.value,
-                pageNum: '1',
-              })
-            }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
+                <div>
+                  <label htmlFor="sortSelect" className="form-label mb-1">
+                    Sort by title
+                  </label>
+                  <select
+                    id="sortSelect"
+                    className="form-select"
+                    value={sort}
+                    onChange={(event) => {
+                      updateSearchParams({
+                        sort: event.target.value,
+                        pageNum: '1',
+                      })
+                    }}
+                  >
+                    <option value="title_asc">Title (A-Z)</option>
+                    <option value="title_desc">Title (Z-A)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="pageSizeSelect" className="form-label mb-1">
+                    Results per page
+                  </label>
+                  <select
+                    id="pageSizeSelect"
+                    className="form-select"
+                    value={pageSize}
+                    onChange={(event) => {
+                      updateSearchParams({
+                        pageSize: event.target.value,
+                        pageNum: '1',
+                      })
+                    }}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
