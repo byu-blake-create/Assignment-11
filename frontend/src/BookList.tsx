@@ -187,7 +187,7 @@ function BookList() {
       {/* Display each book's details in a readable card layout. */}
       <div className="row g-3">
         {books.map((book) => (
-          <div key={book.bookID} className="col-12">
+          <div key={book.bookID} className="col-12 col-md-6 col-xl-4">
             <div className="card shadow-sm h-100">
               <div className="card-body">
                 <h3 className="card-title h5 mb-3">{book.title}</h3>
