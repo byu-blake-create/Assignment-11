@@ -1,0 +1,43 @@
+import { useNavigate } from 'react-router-dom'
+import { useCart } from './context/CartContext'
+
+function CartSummary() {
+  const navigate = useNavigate()
+  const { cart } = useCart()
+  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0)
+
+  return (
+    <section
+      className="cart-summary alert alert-light border mb-4"
+      aria-live="polite"
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate('/cart')}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          navigate('/cart')
+        }
+      }}
+    >
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h2 className="h6 mb-1">Cart Summary</h2>
+          <p className="mb-0 text-secondary">
+            {totalQuantity === 0
+              ? 'Your cart is empty.'
+              : `${cart.length} line item(s), ${totalQuantity} book(s)`}
+          </p>
+        </div>
+
+        <div className="text-end">
+          <div className="fw-semibold">${totalAmount.toFixed(2)}</div>
+          <small className="text-secondary">Open cart</small>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default CartSummary

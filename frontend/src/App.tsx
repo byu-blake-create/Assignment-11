@@ -1,18 +1,19 @@
-import BookstoreHeader from './BookstoreHeader'
-import BookList from './BookList'
 import './App.css'
+import { CartProvider } from './context/CartContext'
+import BookstorePage from './pages/BookstorePage'
+import CartPage from './pages/CartPage'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {
   return (
-    <main className="app-shell">
-      {/* Show the page title and short intro for the bookstore app. */}
-      <BookstoreHeader />
-
-      {/* Place the main book browsing feature inside the page layout. */}
-      <section className="bookstore-panel">
-        <BookList />
-      </section>
-    </main>
+    <CartProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<BookstorePage />} />
+          <Route path="/cart" element={<CartPage />} />
+        </Routes>
+      </Router>
+    </CartProvider>
   )
 }
 

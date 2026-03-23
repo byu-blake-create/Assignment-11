@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useCart } from './context/CartContext'
+import type { CartItem } from './types/CartItem'
 import type { Book, BookResponse } from './types/book'
 
 // Point the frontend to the backend route you are using during local development.
@@ -14,6 +17,8 @@ function BookList() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [totalItems, setTotalItems] = useState<number>(0)
   const [error, setError] = useState<string>('')
+  const { addToCart, cart } = useCart()
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Load the available categories once so the filter options come from the API.
@@ -71,6 +76,18 @@ function BookList() {
   }, [pageSize, pageNum, sort, selectedCategory])
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+
+  const handleAddToCart = (book: Book) => {
+    const newItem: CartItem = {
+      bookId: book.bookID,
+      bookTitle: book.title,
+      price: book.price,
+      quantity: 1,
+    }
+
+    addToCart(newItem)
+    navigate('/cart')
+  }
 
   return (
     <>
@@ -174,6 +191,21 @@ function BookList() {
                     <strong>Price:</strong> ${book.price.toFixed(2)}
                   </li>
                 </ul>
+
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
+                  <small className="text-secondary">
+                    In cart:{' '}
+                    {cart.find((item) => item.bookId === book.bookID)?.quantity ?? 0}
+                  </small>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => handleAddToCart(book)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
           </div>
