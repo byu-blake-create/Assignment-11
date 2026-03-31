@@ -1,99 +1,99 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useCart } from './context/CartContext'
-import type { CartItem } from './types/CartItem'
-import type { Book, BookResponse } from './types/book'
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useCart } from './context/useCart';
+import type { CartItem } from './types/CartItem';
+import type { Book, BookResponse } from './types/book';
 
 // Point the frontend to the backend route you are using during local development.
-const apiUrl = 'http://localhost:5028/books'
+const apiUrl = 'http://localhost:5028/books';
 
 function BookList() {
   // Keep track of the loaded books and the user's current paging and sorting choices.
-  const [books, setBooks] = useState<Book[]>([])
-  const [categories, setCategories] = useState<string[]>(['All'])
-  const [totalItems, setTotalItems] = useState<number>(0)
-  const [error, setError] = useState<string>('')
-  const [controlsOpen, setControlsOpen] = useState<boolean>(true)
-  const { addToCart, cart } = useCart()
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [books, setBooks] = useState<Book[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [error, setError] = useState<string>('');
+  const [controlsOpen, setControlsOpen] = useState<boolean>(true);
+  const { addToCart, cart } = useCart();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Mirror the browsing state into the URL so pagination and filters survive route changes.
-  const pageSize = Math.max(1, Number(searchParams.get('pageSize')) || 5)
-  const pageNum = Math.max(1, Number(searchParams.get('pageNum')) || 1)
-  const sort = searchParams.get('sort') ?? 'title_asc'
-  const selectedCategory = searchParams.get('category') ?? 'All'
+  const pageSize = Math.max(1, Number(searchParams.get('pageSize')) || 5);
+  const pageNum = Math.max(1, Number(searchParams.get('pageNum')) || 1);
+  const sort = searchParams.get('sort') ?? 'title_asc';
+  const selectedCategory = searchParams.get('category') ?? 'All';
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
-    const nextParams = new URLSearchParams(searchParams)
+    const nextParams = new URLSearchParams(searchParams);
 
     Object.entries(updates).forEach(([key, value]) => {
       if (!value || value === 'All') {
-        nextParams.delete(key)
+        nextParams.delete(key);
       } else {
-        nextParams.set(key, value)
+        nextParams.set(key, value);
       }
-    })
+    });
 
-    setSearchParams(nextParams)
-  }
+    setSearchParams(nextParams);
+  };
 
   useEffect(() => {
     // Load the available categories once so the filter options come from the API.
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${apiUrl}/categories`)
+        const response = await fetch(`${apiUrl}/categories`);
 
         if (!response.ok) {
-          throw new Error('Could not load book categories from the API.')
+          throw new Error('Could not load book categories from the API.');
         }
 
-        const data: string[] = await response.json()
-        setCategories(data.length > 0 ? data : ['All'])
+        const data: string[] = await response.json();
+        setCategories(data.length > 0 ? data : ['All']);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Something went wrong.')
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     // Reload the book list whenever the user changes page, page size, sort order, or category.
     const fetchBooks = async () => {
       try {
-        setError('')
+        setError('');
 
         const query = new URLSearchParams({
           pageSize: pageSize.toString(),
           pageNum: pageNum.toString(),
           sort,
-        })
+        });
 
         if (selectedCategory !== 'All') {
-          query.set('category', selectedCategory)
+          query.set('category', selectedCategory);
         }
 
-        const response = await fetch(`${apiUrl}?${query.toString()}`)
+        const response = await fetch(`${apiUrl}?${query.toString()}`);
 
         if (!response.ok) {
-          throw new Error('Could not load books from the API.')
+          throw new Error('Could not load books from the API.');
         }
 
         // Save the returned books and total count so the page can render correctly.
-        const data: BookResponse = await response.json()
-        setBooks(data.books)
-        setTotalItems(data.totalNumBooks)
+        const data: BookResponse = await response.json();
+        setBooks(data.books);
+        setTotalItems(data.totalNumBooks);
       } catch (err) {
         // Show a readable message if the frontend cannot reach the API.
-        setError(err instanceof Error ? err.message : 'Something went wrong.')
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
       }
-    }
+    };
 
-    fetchBooks()
-  }, [pageSize, pageNum, sort, selectedCategory])
+    fetchBooks();
+  }, [pageSize, pageNum, sort, selectedCategory]);
 
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
   const handleAddToCart = (book: Book) => {
     // Convert the current book into the cart shape expected by the shared context.
@@ -102,13 +102,15 @@ function BookList() {
       bookTitle: book.title,
       price: book.price,
       quantity: 1,
-    }
+    };
 
-    addToCart(newItem)
+    addToCart(newItem);
     // Preserve the current browse state so Continue Shopping can return here.
-    const returnTo = searchParams.toString() ? `/?${searchParams.toString()}` : '/'
-    navigate('/cart', { state: { returnTo, addedTitle: book.title } })
-  }
+    const returnTo = searchParams.toString()
+      ? `/?${searchParams.toString()}`
+      : '/';
+    navigate('/cart', { state: { returnTo, addedTitle: book.title } });
+  };
 
   return (
     <>
@@ -152,7 +154,7 @@ function BookList() {
                       updateSearchParams({
                         category: event.target.value,
                         pageNum: '1',
-                      })
+                      });
                     }}
                   >
                     {categories.map((category) => (
@@ -175,7 +177,7 @@ function BookList() {
                       updateSearchParams({
                         sort: event.target.value,
                         pageNum: '1',
-                      })
+                      });
                     }}
                   >
                     <option value="title_asc">Title (A-Z)</option>
@@ -195,7 +197,7 @@ function BookList() {
                       updateSearchParams({
                         pageSize: event.target.value,
                         pageNum: '1',
-                      })
+                      });
                     }}
                   >
                     <option value="5">5</option>
@@ -249,7 +251,8 @@ function BookList() {
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
                   <small className="text-secondary">
                     In cart:{' '}
-                    {cart.find((item) => item.bookId === book.bookID)?.quantity ?? 0}
+                    {cart.find((item) => item.bookId === book.bookID)
+                      ?.quantity ?? 0}
                   </small>
 
                   <button
@@ -271,7 +274,9 @@ function BookList() {
         <button
           className="btn btn-outline-primary"
           disabled={pageNum === 1}
-          onClick={() => updateSearchParams({ pageNum: (pageNum - 1).toString() })}
+          onClick={() =>
+            updateSearchParams({ pageNum: (pageNum - 1).toString() })
+          }
         >
           Previous
         </button>
@@ -280,7 +285,9 @@ function BookList() {
           <button
             key={index + 1}
             className="btn btn-outline-primary"
-            onClick={() => updateSearchParams({ pageNum: (index + 1).toString() })}
+            onClick={() =>
+              updateSearchParams({ pageNum: (index + 1).toString() })
+            }
             disabled={pageNum === index + 1}
           >
             {index + 1}
@@ -290,13 +297,15 @@ function BookList() {
         <button
           className="btn btn-outline-primary"
           disabled={pageNum === totalPages || totalPages === 0}
-          onClick={() => updateSearchParams({ pageNum: (pageNum + 1).toString() })}
+          onClick={() =>
+            updateSearchParams({ pageNum: (pageNum + 1).toString() })
+          }
         >
           Next
         </button>
       </div>
     </>
-  )
+  );
 }
 
-export default BookList
+export default BookList;

@@ -1,8 +1,8 @@
-import './App.css'
-import { CartProvider } from './context/CartContext'
-import BookstorePage from './pages/BookstorePage'
-import CartPage from './pages/CartPage'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import './App.css';
+import { CartProvider } from './context/CartContext';
+import BookstorePage from './pages/BookstorePage';
+import CartPage from './pages/CartPage';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         </Routes>
       </Router>
     </CartProvider>
-  )
+  );
 }
 
-export default App
+export default App;

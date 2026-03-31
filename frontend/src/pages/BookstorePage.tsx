@@ -1,6 +1,6 @@
-import BookstoreHeader from '../BookstoreHeader'
-import BookList from '../BookList'
-import CartSummary from '../CartSummary'
+import BookstoreHeader from '../BookstoreHeader';
+import BookList from '../BookList';
+import CartSummary from '../CartSummary';
 
 function BookstorePage() {
   return (
@@ -12,7 +12,7 @@ function BookstorePage() {
         <BookList />
       </section>
     </main>
-  )
+  );
 }
 
-export default BookstorePage
+export default BookstorePage;

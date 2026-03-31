@@ -8,7 +8,7 @@ function BookstoreHeader() {
         pagination.
       </p>
     </section>
-  )
+  );
 }
 
-export default BookstoreHeader
+export default BookstoreHeader;

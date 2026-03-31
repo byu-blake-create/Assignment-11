@@ -1,32 +1,35 @@
-import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/useCart';
 
 interface CartPageLocationState {
-  returnTo?: string
-  addedTitle?: string
+  returnTo?: string;
+  addedTitle?: string;
 }
 
 function CartPage() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { cart, clearCart, removeFromCart, totalAmount, totalQuantity } = useCart()
-  const locationState = location.state as CartPageLocationState | null
-  const continueShoppingTarget = locationState?.returnTo ?? '/'
-  const [showToast, setShowToast] = useState<boolean>(Boolean(locationState?.addedTitle))
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { cart, clearCart, removeFromCart, totalAmount, totalQuantity } =
+    useCart();
+  const locationState = location.state as CartPageLocationState | null;
+  const continueShoppingTarget = locationState?.returnTo ?? '/';
+  const [showToast, setShowToast] = useState<boolean>(
+    Boolean(locationState?.addedTitle)
+  );
 
   useEffect(() => {
     if (!locationState?.addedTitle) {
-      return
+      return;
     }
 
     const timeoutId = window.setTimeout(() => {
-      setShowToast(false)
-    }, 2500)
+      setShowToast(false);
+    }, 2500);
 
     // Dismiss the toast automatically after a short confirmation window.
-    return () => window.clearTimeout(timeoutId)
-  }, [locationState?.addedTitle])
+    return () => window.clearTimeout(timeoutId);
+  }, [locationState?.addedTitle]);
 
   return (
     <main className="app-shell">
@@ -36,7 +39,11 @@ function CartPage() {
           ============================================ */}
       {showToast ? (
         <div className="toast-container position-fixed top-0 end-0 p-3">
-          <div className="toast show text-bg-success border-0" role="status" aria-live="polite">
+          <div
+            className="toast show text-bg-success border-0"
+            role="status"
+            aria-live="polite"
+          >
             <div className="d-flex">
               <div className="toast-body">
                 Added "{locationState?.addedTitle}" to your cart.
@@ -64,7 +71,9 @@ function CartPage() {
         <div className="col-12 col-lg-8">
           <section className="bookstore-panel h-100">
             {cart.length === 0 ? (
-              <div className="alert alert-light border mb-0">Your cart is empty.</div>
+              <div className="alert alert-light border mb-0">
+                Your cart is empty.
+              </div>
             ) : (
               <div className="table-responsive">
                 <table className="table align-middle mb-0">
@@ -139,7 +148,7 @@ function CartPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-export default CartPage
+export default CartPage;
