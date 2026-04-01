@@ -6,6 +6,11 @@
 
 .bookstore-header {
   margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .eyebrow {
@@ -35,4 +40,82 @@
 
 .book-controls .form-select {
   min-width: 180px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-header {
+  align-items: center;
+}
+
+.admin-books-table td {
+  vertical-align: middle;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(33, 37, 41, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1050;
+}
+
+.admin-modal-backdrop .modal-dialog {
+  margin: 0;
+  width: min(100%, 860px);
+}
+
+.admin-modal-backdrop .modal-content {
+  background: #ffffff;
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.admin-modal-backdrop .modal-header,
+.admin-modal-backdrop .modal-body,
+.admin-modal-backdrop .modal-footer {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.admin-modal-backdrop .modal-header {
+  padding-top: 1.5rem;
+}
+
+.admin-modal-backdrop .modal-body {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.admin-modal-backdrop .modal-footer {
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    padding-top: 32px;
+  }
+
+  .bookstore-header {
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    flex: 1 1 180px;
+  }
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  fetchBooks as fetchBooksFromApi,
+  fetchCategories as fetchCategoriesFromApi,
+} from './api/books';
 import { useCart } from './context/useCart';
 import type { CartItem } from './types/CartItem';
 import type { Book, BookResponse } from './types/book';
-
-// Point the frontend to the backend route you are using during local development.
-const apiUrl = 'http://localhost:5028/books';
 
 function BookList() {
   // Keep track of the loaded books and the user's current paging and sorting choices.
@@ -40,48 +41,31 @@ function BookList() {
 
   useEffect(() => {
     // Load the available categories once so the filter options come from the API.
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const response = await fetch(`${apiUrl}/categories`);
-
-        if (!response.ok) {
-          throw new Error('Could not load book categories from the API.');
-        }
-
-        const data: string[] = await response.json();
+        const data = await fetchCategoriesFromApi();
         setCategories(data.length > 0 ? data : ['All']);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong.');
       }
     };
 
-    fetchCategories();
+    loadCategories();
   }, []);
 
   useEffect(() => {
     // Reload the book list whenever the user changes page, page size, sort order, or category.
-    const fetchBooks = async () => {
+    const loadBooks = async () => {
       try {
         setError('');
 
-        const query = new URLSearchParams({
-          pageSize: pageSize.toString(),
-          pageNum: pageNum.toString(),
-          sort,
-        });
-
-        if (selectedCategory !== 'All') {
-          query.set('category', selectedCategory);
-        }
-
-        const response = await fetch(`${apiUrl}?${query.toString()}`);
-
-        if (!response.ok) {
-          throw new Error('Could not load books from the API.');
-        }
-
         // Save the returned books and total count so the page can render correctly.
-        const data: BookResponse = await response.json();
+        const data: BookResponse = await fetchBooksFromApi({
+          pageSize,
+          pageNum,
+          sort,
+          category: selectedCategory,
+        });
         setBooks(data.books);
         setTotalItems(data.totalNumBooks);
       } catch (err) {
@@ -90,7 +74,7 @@ function BookList() {
       }
     };
 
-    fetchBooks();
+    loadBooks();
   }, [pageSize, pageNum, sort, selectedCategory]);
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
