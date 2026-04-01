@@ -1,4 +1,5 @@
 using bookstore.API.Data;
+using bookstore.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,53 @@ public class BooksController : ControllerBase
     private readonly BookstoreContext _bookstoreContext;
 
     public BooksController(BookstoreContext temp) => _bookstoreContext = temp;
+
+    private static Dictionary<string, string[]> ValidateBook(Book book)
+    {
+        var errors = new Dictionary<string, string[]>();
+
+        if (string.IsNullOrWhiteSpace(book.Title))
+        {
+            errors["Title"] = ["Title is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(book.Author))
+        {
+            errors["Author"] = ["Author is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(book.Publisher))
+        {
+            errors["Publisher"] = ["Publisher is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(book.ISBN))
+        {
+            errors["ISBN"] = ["ISBN is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(book.Classification))
+        {
+            errors["Classification"] = ["Classification is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(book.Category))
+        {
+            errors["Category"] = ["Category is required."];
+        }
+
+        if (book.PageCount < 1)
+        {
+            errors["PageCount"] = ["Page count must be greater than 0."];
+        }
+
+        if (book.Price <= 0)
+        {
+            errors["Price"] = ["Price must be greater than 0."];
+        }
+
+        return errors;
+    }
 
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories()
@@ -86,5 +134,77 @@ public class BooksController : ControllerBase
         };
 
         return Ok(responseObject);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateBook([FromBody] Book book)
+    {
+        var validationErrors = ValidateBook(book);
+
+        if (validationErrors.Count > 0)
+        {
+            return BadRequest(new { Errors = validationErrors });
+        }
+
+        // Let SQLite assign the next primary key for newly created books.
+        book.BookID = 0;
+
+        _bookstoreContext.Books.Add(book);
+        await _bookstoreContext.SaveChangesAsync();
+
+        return Created($"/Books/{book.BookID}", book);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateBook(int id, [FromBody] Book updatedBook)
+    {
+        if (id != updatedBook.BookID)
+        {
+            return BadRequest("Route id must match the book id in the request body.");
+        }
+
+        var validationErrors = ValidateBook(updatedBook);
+
+        if (validationErrors.Count > 0)
+        {
+            return BadRequest(new { Errors = validationErrors });
+        }
+
+        var existingBook = await _bookstoreContext.Books.FindAsync(id);
+
+        if (existingBook is null)
+        {
+            return NotFound();
+        }
+
+        // Update the tracked entity so EF Core persists only the intended row.
+        existingBook.Title = updatedBook.Title;
+        existingBook.Author = updatedBook.Author;
+        existingBook.Publisher = updatedBook.Publisher;
+        existingBook.ISBN = updatedBook.ISBN;
+        existingBook.Classification = updatedBook.Classification;
+        existingBook.Category = updatedBook.Category;
+        existingBook.PageCount = updatedBook.PageCount;
+        existingBook.Price = updatedBook.Price;
+
+        await _bookstoreContext.SaveChangesAsync();
+
+        return Ok(existingBook);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteBook(int id)
+    {
+        var existingBook = await _bookstoreContext.Books.FindAsync(id);
+
+        if (existingBook is null)
+        {
+            return NotFound();
+        }
+
+        _bookstoreContext.Books.Remove(existingBook);
+        await _bookstoreContext.SaveChangesAsync();
+
+        return NoContent();
     }
 }
