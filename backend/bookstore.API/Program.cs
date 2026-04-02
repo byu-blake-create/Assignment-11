@@ -13,7 +13,8 @@ builder.Services.AddCors(options =>
                 "http://localhost:5173",
                 "https://localhost:5173",
                 "http://localhost:4173",
-                "https://localhost:4173")
+                "https://localhost:4173",
+                "https://thankful-beach-0fa62851e.1.azurestaticapps.net")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
