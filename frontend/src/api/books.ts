@@ -1,6 +1,8 @@
 import type { Book, BookResponse } from '../types/book';
 
-const apiUrl = 'http://localhost:5028/books';
+const apiUrl = import.meta.env.DEV
+  ? 'http://localhost:5028/books'
+  : 'https://assignment13backend-hmhnb9aqathtd9e3.westus2-01.azurewebsites.net/Books';
 
 type BookRequest = Omit<Book, never>;
 
